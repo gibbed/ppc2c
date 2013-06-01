@@ -560,18 +560,17 @@ bool clrrwi(ea_t ea, char* buff, int buffSize)
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
-bool clrslwi(ea_t ea, char* buff, int buffSize)
+bool clrlslwi(ea_t ea, char* buff, int buffSize)
 {
-	// Clear left and shift left immediate
-	// clrslwi RA, RS, b, n
+	// clrlslwi RA, RS, b, n
 	// (rlwinm RA, RS, b-n, 31-n)
 	qstrncpy(g_RA, g_opnd_s0, sizeof(g_RA));
 	qstrncpy(g_RS, g_opnd_s1, sizeof(g_RS));
 	int b = atol(g_opnd_s2);
 	int n = atol(g_opnd_s3);
 	g_SH = n;
-	g_MB = 31;
-	g_ME = 31-b;
+	g_MB = b-n;
+	g_ME = 31-n;
 	
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
@@ -585,7 +584,7 @@ bool extrwi(ea_t ea, char* buff, int buffSize)
 	qstrncpy(g_RS, g_opnd_s1, sizeof(g_RS));
 	int n = atol(g_opnd_s2);
 	int b = atol(g_opnd_s3);
-	g_SH = 32-(b+n);
+	g_SH = b+n;
 	g_MB = 32-n;
 	g_ME = 31;
 	
@@ -884,7 +883,7 @@ bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 	// clear
 	else if(qstrcmp(g_mnem, "clrlwi")==0 )	return clrlwi(	ea, buff, buffSize);
 	else if(qstrcmp(g_mnem, "clrrwi")==0 )	return clrrwi(	ea, buff, buffSize);
-	else if(qstrcmp(g_mnem, "clrslwi")==0 )	return clrslwi(	ea, buff, buffSize);
+	else if(qstrcmp(g_mnem, "clrlslwi")==0 ) return clrlslwi( ea, buff, buffSize);
 	// extract
 	else if(qstrcmp(g_mnem, "extlwi")==0 )	return extlwi(	ea, buff, buffSize);
 	else if(qstrcmp(g_mnem, "extrwi")==0 )	return extrwi(	ea, buff, buffSize);
