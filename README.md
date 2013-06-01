@@ -1,5 +1,6 @@
 PPC 2 C Plugin
 ==============
+Modified version of Zak Stanborough's PPC2C plugin released as part of [Hex-Rays Plug-In Contest 2009](https://www.hex-rays.com/contests/2009/).
 
 Overview
 --------
