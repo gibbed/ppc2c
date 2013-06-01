@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PPC2C", "PPC2C.vcproj", "{74F130DA-94CF-4F36-AB4D-2A228C6020EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug64|Win32 = Debug64|Win32
+		Release|Win32 = Release|Win32
+		Release64|Win32 = Release64|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Debug|Win32.Build.0 = Debug|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Debug64|Win32.ActiveCfg = Debug64|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Debug64|Win32.Build.0 = Debug64|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Release|Win32.ActiveCfg = Release|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Release|Win32.Build.0 = Release|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Release64|Win32.ActiveCfg = Release64|Win32
+		{74F130DA-94CF-4F36-AB4D-2A228C6020EC}.Release64|Win32.Build.0 = Release64|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
