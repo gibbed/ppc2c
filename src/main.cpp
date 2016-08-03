@@ -1,9 +1,9 @@
-// 
+//
 // PPC To C
-// 
+//
 // by working with the disassembled text this plugin should
 // work with both big and little endian PPC.
-// 
+//
 
 
 #include <ida.hpp>
@@ -46,7 +46,7 @@ unsigned int GenerateMask32(int MB, int ME)
 		msg("Error with paramters GenerateMask32(%d, %d)\n", MB, ME);
 		return 0;
 	}
-	
+
 	unsigned int mask = 0;
 	if(MB < ME+1)
 	{
@@ -68,7 +68,7 @@ unsigned int GenerateMask32(int MB, int ME)
 		unsigned int mask_hi = GenerateMask32(MB, 31);
 		mask = mask_lo | mask_hi;
 	}
-	
+
 	return mask;
 }
 
@@ -82,7 +82,7 @@ unsigned long long GenerateMask64(int MB, int ME)
 		msg("Error with paramters GenerateMask64(%d, %d)\n", MB, ME);
 		return 0;
 	}
-	
+
 	unsigned long long mask = 0;
 	if(MB < ME+1)
 	{
@@ -104,7 +104,7 @@ unsigned long long GenerateMask64(int MB, int ME)
 		unsigned long long mask_hi = GenerateMask64(MB, 63);
 		mask = mask_lo | mask_hi;
 	}
-	
+
 	return mask;
 }
 
@@ -119,7 +119,7 @@ bool GenerateRotate32(char* buff, int buffSize, const char* src, int leftShift, 
 		qsnprintf(buff, buffSize, "%s", src);
 		return false;
 	}
-	
+
 	if(((MASK32_ALLSET<<leftShift ) & mask) == 0)
 	{
 		// right shift only
@@ -154,7 +154,7 @@ bool GenerateRotate64(char* buff, int buffSize, const char* src, int leftShift, 
 		qsnprintf(buff, buffSize, "%s", src);
 		return false;
 	}
-	
+
 	if(((MASK64_ALLSET<<leftShift ) & mask) == 0)
 	{
 		// right shift only
@@ -193,7 +193,7 @@ bool Rotate_iMask32(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = 0", g_RA);
 		return true;
 	}
-	
+
 	// work out "rotate" part of the instruction
 	// if all mask bits are set, then no need to use the mask
 	char rot_str[G_STR_SIZE];
@@ -204,11 +204,11 @@ bool Rotate_iMask32(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, rot_str);
 		return true;
 	}
-	
+
 	// generate mask string
 	char mask_str[G_STR_SIZE];
 	qsnprintf(mask_str, sizeof(mask_str), "%s%X", (mask<0xA)?"":"0x", mask);
-	
+
 	// generate the resultant string
 	qsnprintf(buff, buffSize, "%s = (%s) & %s", g_RA, rot_str, mask_str);
 	return true;
@@ -226,7 +226,7 @@ bool iRotate_iMask32(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = 0", g_RA);
 		return true;
 	}
-	
+
 	// work out "rotate" part of the instruction
 	// if all mask bits are set, then no need to use the mask
 	char rot_str[G_STR_SIZE];
@@ -240,13 +240,13 @@ bool iRotate_iMask32(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, rot_str);
 		return true;
 	}
-	
+
 //	MASK32_ALLSET << leftRotate
-	
+
 	// generate mask string
 	char mask_str[G_STR_SIZE];
 	qsnprintf(mask_str, sizeof(mask_str), "%s%X", (mask<0xA)?"":"0x", mask);
-	
+
 	// generate the resultant string
 	if(brackets)
 		qsnprintf(buff, buffSize, "%s = (%s) & %s", g_RA, rot_str, mask_str);
@@ -267,7 +267,7 @@ bool insert_iRotate_iMask32(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, g_RA);
 		return true;
 	}
-	
+
 	// work out "rotate" part of the instruction
 	// if all mask bits are set, then no need to use the mask
 	char rot_str[G_STR_SIZE];
@@ -277,14 +277,14 @@ bool insert_iRotate_iMask32(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, rot_str);
 		return true;
 	}
-	
+
 	// generate mask strings
 	char mask_str[G_STR_SIZE];
 	qsnprintf(mask_str, sizeof(mask_str), "%s%X", (mask<0xA)?"":"0x", mask);
 	unsigned int not_mask = ~mask;
 	char not_mask_str[G_STR_SIZE];
 	qsnprintf(not_mask_str, sizeof(not_mask_str), "%s%X", (not_mask<0xA)?"":"0x", not_mask);
-	
+
 	// generate the resultant string
 	if(brackets)
 		qsnprintf(buff, buffSize, "%s = (%s & ~%s) | ((%s) & %s)", g_RA,
@@ -310,7 +310,7 @@ bool Rotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = 0", g_RA);
 		return true;
 	}
-	
+
 	// work out "rotate" part of the instruction
 	// if all mask bits are set, then no need to use the mask
 	char rot_str[G_STR_SIZE];
@@ -320,14 +320,14 @@ bool Rotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, rot_str);
 		return true;
 	}
-	
+
 	// generate mask string
 	char mask_str[G_STR_SIZE];
 	if(mask>>32 == 0)
 		qsnprintf(mask_str, sizeof(mask_str), "%s%X", (mask<0xA)?"":"0x", (unsigned long)mask);
 	else
 		qsnprintf(mask_str, sizeof(mask_str), "%s%X%08X", (mask<0xA)?"":"0x", (unsigned long)(mask>>32), (unsigned long)mask);
-	
+
 	// generate the resultant string
 	qsnprintf(buff, buffSize, "%s = (%s) & %s", g_RA, rot_str, mask_str);
 	return true;
@@ -345,7 +345,7 @@ bool iRotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = 0", g_RA);
 		return true;
 	}
-	
+
 	// work out "rotate" part of the instruction
 	// if all mask bits are set, then no need to use the mask
 	char rot_str[G_STR_SIZE];
@@ -355,14 +355,14 @@ bool iRotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, rot_str);
 		return true;
 	}
-	
+
 	// generate mask string
 	char mask_str[G_STR_SIZE];
 	if(mask>>32 == 0)
 		qsnprintf(mask_str, sizeof(mask_str), "%s%X", (mask<0xA)?"":"0x", (unsigned long)mask);
 	else
 		qsnprintf(mask_str, sizeof(mask_str), "%s%X%08X", (mask<0xA)?"":"0x", (unsigned long)(mask>>32), (unsigned long)mask);
-	
+
 	// generate the resultant string
 	if(brackets)
 		qsnprintf(buff, buffSize, "%s = (%s) & %s", g_RA, rot_str, mask_str);
@@ -383,7 +383,7 @@ bool insert_iRotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = 0", g_RA);
 		return true;
 	}
-	
+
 	// work out "rotate" part of the instruction
 	// if all mask bits are set, then no need to use the mask
 	char rot_str[G_STR_SIZE];
@@ -393,7 +393,7 @@ bool insert_iRotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(buff, buffSize, "%s = %s", g_RA, rot_str);
 		return true;
 	}
-	
+
 	// generate mask string
 	char mask_str[G_STR_SIZE];
 	if(mask>>32 == 0)
@@ -406,7 +406,7 @@ bool insert_iRotate_iMask64(ea_t ea, char* buff, int buffSize,
 		qsnprintf(not_mask_str, sizeof(not_mask_str), "%s%X", (not_mask<0xA)?"":"0x", (unsigned long)not_mask);
 	else
 		qsnprintf(not_mask_str, sizeof(not_mask_str), "%s%X%08X", (not_mask<0xA)?"":"0x", (unsigned long)(not_mask>>32), (unsigned long)not_mask);
-	
+
 	// generate the resultant string
 	if(brackets)
 		qsnprintf(buff, buffSize, "%s = (%s & ~%s) | ((%s) & %s)", g_RA,
@@ -439,14 +439,14 @@ bool bc(ea_t ea, char* buff, int buffSize)
 	char cr_str[G_STR_SIZE] = "cr0";
 	char condition_str[G_STR_SIZE] = "";
 	int BO = 0;
-	
+
 	if( strlen(g_opnd_s2) )
 	{
 		// 3 args
 		qstrncpy(BO_str, g_opnd_s0, sizeof(BO_str));
 		qstrncpy(BI_str, g_opnd_s1, sizeof(BI_str));
 		qstrncpy(target_addr, g_opnd_s2, sizeof(target_addr));
-		
+
 		BO = atol(BO_str);
 		if( strncmp(BI_str, "4*", 2) == 0 )
 		{
@@ -466,13 +466,13 @@ bool bc(ea_t ea, char* buff, int buffSize)
 		// 1 arg. can you have only 1 arg?
 		qstrncpy(target_addr, g_opnd_s0, sizeof(target_addr));
 	}
-	
+
 	if(		strcmp(condition_str, "lt")==0) qstrncpy(condition_str, "less than", sizeof(condition_str));
 	else if(strcmp(condition_str, "le")==0) qstrncpy(condition_str, "less than or equal", sizeof(condition_str));
 	else if(strcmp(condition_str, "eq")==0) qstrncpy(condition_str, "equal", sizeof(condition_str));
 	else if(strcmp(condition_str, "ge")==0) qstrncpy(condition_str, "greater than or equal", sizeof(condition_str));
 	else if(strcmp(condition_str, "gt")==0) qstrncpy(condition_str, "greater than", sizeof(condition_str));
-	
+
 	else if(strcmp(condition_str, "nl")==0) qstrncpy(condition_str, "not less than", sizeof(condition_str));
 	else if(strcmp(condition_str, "ne")==0) qstrncpy(condition_str, "not equal", sizeof(condition_str));
 	else if(strcmp(condition_str, "ng")==0) qstrncpy(condition_str, "not greater than", sizeof(condition_str));
@@ -526,7 +526,7 @@ bool bc(ea_t ea, char* buff, int buffSize)
 		// branch always
 		qsnprintf(buff, buffSize, "goto %s", target_addr);
 	}
-	
+
 	return true;
 }
 
@@ -541,7 +541,7 @@ bool clrlwi(ea_t ea, char* buff, int buffSize)
 	g_SH = 0;
 	g_MB = n;
 	g_ME = 31;
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -571,7 +571,7 @@ bool clrlslwi(ea_t ea, char* buff, int buffSize)
 	g_SH = n;
 	g_MB = b-n;
 	g_ME = 31-n;
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -587,7 +587,7 @@ bool extrwi(ea_t ea, char* buff, int buffSize)
 	g_SH = b+n;
 	g_MB = 32-n;
 	g_ME = 31;
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 bool extlwi(ea_t ea, char* buff, int buffSize)
@@ -602,7 +602,7 @@ bool extlwi(ea_t ea, char* buff, int buffSize)
 	g_SH = b;
 	g_MB = 0;
 	g_ME = n-1;
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -618,7 +618,7 @@ bool inslwi(ea_t ea, char* buff, int buffSize)
 	g_SH = 32-b;
 	g_MB = b;
 	g_ME = b+n-1;
-	
+
 	return insert_iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -634,7 +634,7 @@ bool insrwi(ea_t ea, char* buff, int buffSize)
 	g_SH = 32-(b+n);
 	g_MB = b;
 	g_ME = b+n-1;
-	
+
 	return insert_iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -647,7 +647,7 @@ bool rlwinm(ea_t ea, char* buff, int buffSize)
 	g_SH = atol(g_opnd_s2);
 	g_MB = atol(g_opnd_s3);
 	g_ME = atol(g_opnd_s4);
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -660,7 +660,7 @@ bool rlwnm(ea_t ea, char* buff, int buffSize)
 	qstrncpy(g_RB, g_opnd_s2, sizeof(g_RB));
 	g_MB = atol(g_opnd_s3);
 	g_ME = atol(g_opnd_s4);
-	
+
 	return Rotate_iMask32(ea, buff, buffSize, g_RB, g_MB, g_ME);
 }
 
@@ -675,7 +675,7 @@ bool rotlwi(ea_t ea, char* buff, int buffSize)
 	g_SH = n;
 	g_MB = 0;
 	g_ME = 31;
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -690,7 +690,7 @@ bool rotrwi(ea_t ea, char* buff, int buffSize)
 	g_SH = 32-n;
 	g_MB = 0;
 	g_ME = 31;
-	
+
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -704,7 +704,7 @@ bool rotlw(ea_t ea, char* buff, int buffSize)
 	qstrncpy(g_RB, g_opnd_s2, sizeof(g_RB));
 	g_MB = 0;
 	g_ME = 31;
-	
+
 	return Rotate_iMask32(ea, buff, buffSize, g_RB, g_MB, g_ME);
 }
 
@@ -719,7 +719,7 @@ bool slwi(ea_t ea, char* buff, int buffSize)
 	g_SH = n;
 	g_MB = 0;
 	g_ME = 31-n;
-	
+
 	// fix the mask values because no mask is required when doing "slwi"
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
@@ -734,7 +734,7 @@ bool srwi(ea_t ea, char* buff, int buffSize)
 	g_SH = 32-n;
 	g_MB = n;
 	g_ME = 31;
-	
+
 	// fix the mask values because no mask is required when doing "slwi"
 	return iRotate_iMask32(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
@@ -753,7 +753,7 @@ bool rldcr(ea_t ea, char* buff, int buffSize)
 	qstrncpy(g_RB, g_opnd_s2, sizeof(g_RB));
 	g_MB = 0;
 	g_ME = atol(g_opnd_s3);
-	
+
 	return Rotate_iMask64(ea, buff, buffSize, g_RB, g_MB, g_ME);
 }
 
@@ -766,7 +766,7 @@ bool rldic(ea_t ea, char* buff, int buffSize)
 	g_SH = atol(g_opnd_s2);
 	g_MB = atol(g_opnd_s3);
 	g_ME = 63 - g_SH;
-	
+
 	return iRotate_iMask64(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -779,7 +779,7 @@ bool rldicl(ea_t ea, char* buff, int buffSize)
 	g_SH = atol(g_opnd_s2);
 	g_MB = atol(g_opnd_s3);
 	g_ME = 63;
-	
+
 	return iRotate_iMask64(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -805,7 +805,7 @@ bool rldimi(ea_t ea, char* buff, int buffSize)
 	g_SH = atol(g_opnd_s2);
 	g_MB = atol(g_opnd_s3);
 	g_ME = 63 - g_SH;
-	
+
 	return insert_iRotate_iMask64(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -818,7 +818,7 @@ bool rlwimi(ea_t ea, char* buff, int buffSize)
 	g_SH = atol(g_opnd_s2);
 	g_MB = atol(g_opnd_s3);
 	g_ME = atol(g_opnd_s4);
-	
+
 	return insert_iRotate_iMask64(ea, buff, buffSize, g_SH, g_MB, g_ME);
 }
 
@@ -826,7 +826,7 @@ bool rlwimi(ea_t ea, char* buff, int buffSize)
 
 
 
-// try to do as much work in this function as possible in order to 
+// try to do as much work in this function as possible in order to
 // simplify each "instruction" handling function
 bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 {
@@ -836,28 +836,28 @@ bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 	if( !isCode(get_flags_novalue(ea)) )
 		return false;
 	*buff = 0;
-	
+
 	// get instruction mnemonic
 	if( !ua_mnem(ea, g_mnem, sizeof(g_mnem)) )
 		return false;
 	tag_remove(g_mnem, g_mnem, sizeof(g_mnem));
 	char* ptr = (char*)qstrstr(g_mnem, ".");
 	if(ptr) *ptr = 0;
-	
+
 	// get instruction operand strings
 	// IDA only natively supports 3 operands
 	*g_opnd_s0 = 0;
 	ua_outop2(ea, g_opnd_s0, sizeof(g_opnd_s0), 0);
 	tag_remove(g_opnd_s0, g_opnd_s0, sizeof(g_opnd_s0));
-	
+
 	*g_opnd_s1 = 0;
 	ua_outop2(ea, g_opnd_s1, sizeof(g_opnd_s1), 1);
 	tag_remove(g_opnd_s1, g_opnd_s1, sizeof(g_opnd_s1));
-	
+
 	*g_opnd_s2 = 0;
 	ua_outop2(ea, g_opnd_s2, sizeof(g_opnd_s2), 2);
 	tag_remove(g_opnd_s2, g_opnd_s2, sizeof(g_opnd_s2));
-	
+
 	// use some string manipulation to extract additional operands
 	// when more than 3 operands are used
 	*g_opnd_s4 = 0;
@@ -868,7 +868,7 @@ bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 		// operand-3 exists
 		qstrncpy(g_opnd_s3, comma1+1, sizeof(g_opnd_s3));
 		g_opnd_s2[comma1-g_opnd_s2] = 0;
-		
+
 		const char* comma2 = qstrstr(comma1+1, ",");
 		if(comma2 != NULL)
 		{
@@ -877,7 +877,7 @@ bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 			g_opnd_s3[comma2-(comma1+1)] = 0;
 		}
 	}
-	
+
 	// below is a list of supported instructions
 	if(		qstrcmp(g_mnem, "bc")==0 )		return bc(		ea, buff, buffSize);
 	// clear
@@ -900,7 +900,7 @@ bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 	// shift
 	else if(qstrcmp(g_mnem, "slwi"  )==0 )	return slwi(	ea, buff, buffSize);
 	else if(qstrcmp(g_mnem, "srwi"  )==0 )	return srwi(	ea, buff, buffSize);
-	
+
 	// 64bit versions of the above
 	else if(qstrcmp(g_mnem, "rldcr" )==0 )	return rldcr(	ea, buff, buffSize);
 	else if(qstrcmp(g_mnem, "rldic" )==0 )	return rldic(	ea, buff, buffSize);
@@ -908,7 +908,7 @@ bool PPCAsm2C(ea_t ea, char* buff, int buffSize)
 	else if(qstrcmp(g_mnem, "rldicr")==0 )	return rldicr(	ea, buff, buffSize);
 	else if(qstrcmp(g_mnem, "rldimi")==0 )	return rldimi(	ea, buff, buffSize);
 	else if(qstrcmp(g_mnem, "rlwimi")==0 )	return rlwimi(	ea, buff, buffSize);
-	
+
 	return true;
 }
 
@@ -936,7 +936,7 @@ int idaapi PluginStartup(void)
 	// PPC To C only works with PPC code :)
 	if ( ph.id != PLFM_PPC )
 		return PLUGIN_SKIP;
-	
+
 	// if PPC then this plugin is OK to use
 	return PLUGIN_OK;
 }
@@ -1008,7 +1008,7 @@ void idaapi PluginMain(int param)
 		msg("Unknown mode - Please set the mode of execution in the plugins.cfg file\n");
 		return;
 	}
-	
+
 	// convert all instructions within the bounds
 	char c_code_str[1024];
 	for(ea_t addr=start_addr; addr<end_addr; addr+=4)
@@ -1028,7 +1028,7 @@ void idaapi PluginMain(int param)
 			msg("%x: Error converting PPC to C code\n", addr);
 		}
 	}
-	
+
 	// analyse area to refresh any changes
 	analyze_area(start_addr, end_addr);
 }
@@ -1057,13 +1057,13 @@ plugin_t PLUGIN =
 {
 	// values
 	IDP_INTERFACE_VERSION,
-	0,						// plugin flags	
-	
+	0,						// plugin flags
+
 	// functions
 	PluginStartup,			// initialize
 	PluginShutdown,			// terminate. this pointer may be NULL.
 	PluginMain,				// invoke plugin
-	
+
 	// strings
 	(char*)G_PLUGIN_COMMENT,// long comment about the plugin (may appear on status line or as a hint)
 	(char*)G_PLUGIN_HELP,	// multiline help about the plugin
